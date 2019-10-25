@@ -60,7 +60,7 @@ See :ref:`collections_galaxy_meta` for details.
 docs directory
 ---------------
 
-Keep general documentation for the collection here. Plugins and modules still keep their specific documentation embedded as Python docstrings. Use the ``docs`` folder to describe how to use the roles and plugins the collection provides, role requirements, and so on. Currently we are looking at Markdown as the standard format for documentation files, but this is subject to change.
+Put general documentation for the collection here. Keep the specific documentation for plugins and modules embedded as Python docstrings. Use the ``docs`` folder to describe how to use the roles and plugins the collection provides, role requirements, and so on. Use markdown and do not add subfolders.
 
 Use ``ansible-doc`` to view documentation for plugins inside a collection:
 
@@ -77,7 +77,9 @@ The ``ansible-doc`` command requires the fully qualified collection name (FQCN) 
 plugins directory
 ------------------
 
-Add a 'per plugin type' specific subdirectory here, including ``module_utils`` which is usable not only by modules, but by any other plugin by using their FQCN. This is a way to distribute modules, lookups, filters, and so on, without having to import a role in every play.
+Add a 'per plugin type' specific subdirectory here, including ``module_utils`` which is usable not only by modules, but by most plugins by using their FQCN. This is a way to distribute modules, lookups, filters, and so on, without having to import a role in every play.
+
+Vars plugins are unsupported in collections. Cache plugins may be used in collections for fact caching, but are not supported for inventory plugins.
 
 module_utils
 ^^^^^^^^^^^^
@@ -114,6 +116,11 @@ In the Python example the ``module_util`` in question is called ``qradar`` such 
         not_rest_data_keys=['state']
     )
 
+Note that importing something from an ``__init__.py`` file requires using the file name:
+
+.. code-block:: python
+
+    from ansible_collections.namespace.collection_name.plugins.callback.__init__ import CustomBaseClass
 
 In the PowerShell example the ``module_util`` in question is called ``hyperv`` such that the FCQN is
 ``ansible_example.community.plugins.module_utils.hyperv``:
@@ -238,15 +245,19 @@ as a distribution method, but you can use it directly to install the collection 
 Trying collection locally
 -------------------------
 
-You can try your collection locally by installing it from the tarball.
+You can try your collection locally by installing it from the tarball. The following will enable an adjacent playbook to
+access the collection:
 
 .. code-block:: bash
 
-   ansible-galaxy collection install my_namespace-my_collection-1.0.0.tar.gz -p ./collections/ansible_collections
+   ansible-galaxy collection install my_namespace-my_collection-1.0.0.tar.gz -p ./collections
 
-You should use one of the values configured in :ref:`COLLECTIONS_PATHS` for your path. This is also where Ansible itself will expect to find collections when attempting to use them.
 
-Then try to use the local collection inside a playbook, for more details see :ref:`Using collections <using_collections>`
+You should use one of the values configured in :ref:`COLLECTIONS_PATHS` for your path. This is also where Ansible itself will
+expect to find collections when attempting to use them. If you don't specify a path value, ``ansible-galaxy collection install``
+installs the collection in the first path defined in :ref:`COLLECTIONS_PATHS`, which by default is ``~/.ansible/collections``.
+
+Next, try using the local collection inside a playbook. For examples and more details see :ref:`Using collections <using_collections>`
 
 .. _publishing_collections:
 
