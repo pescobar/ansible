@@ -15,3 +15,4 @@
 - import_tasks: test_symlink.yml
 - import_tasks: test_download.yml
 - import_tasks: test_unprivileged_user.yml
+- import_tasks: test_ownership_top_folder.yml
